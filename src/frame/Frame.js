@@ -27,9 +27,7 @@ export const Frame = {
   unregister (id) {
     this.listeners.delete(id);
 
-    if (!this.listeners.size) {
-      this.cancel();
-    }
+    return !this.listeners.size && this.cancel();
   },
 
   cancel () {
@@ -38,14 +36,14 @@ export const Frame = {
   },
 
   render () {
-    this.id = window.requestAnimationFrame(this.render.bind(this));
-
     let i = this.listeners.size;
     const listeners = [ ...this.listeners.values() ];
 
     while (i--) {
       listeners[i](this.id);
     }
+
+    this.id = window.requestAnimationFrame(this.render.bind(this));
   }
 }
 

@@ -36,15 +36,15 @@ export class Scroller {
     };
   };
 
-  static normalizeOffset ({ offset, clientHeight, innerHeight }) {
+  static normalizeOffset ({ offset, ch, vh }) {
 
     switch (true) {
       case (offset < 0): {
         return 0;
       }
 
-      case (offset > clientHeight - innerHeight): {
-        return clientHeight - innerHeight
+      case (offset > ch - vh): {
+        return ch - vh
       }
 
       default: {
@@ -58,26 +58,18 @@ export class Scroller {
     return Number.parseFloat((offset - (distance * damping)).toFixed(2));
   }
 
-  static isNearEdge ({ clientHeight, innerHeight, offset, delta }) {
+  static isNearEdge ({ ch, vh, offset, delta }) {
     return (offset <= 0 && delta <= 0) ||
-      (offset >= clientHeight - innerHeight && delta >= 0);
-  }
-
-  static scrollRestore () {
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    } else {
-      window.onbeforeunload = () => window.scrollTo(0, 0);
-    }
+      (offset >= ch - vh && delta >= 0);
   }
 
   constructor (props = {}) {
     this.id = props.id;
     this.el = props.el;
+    this.children = Array.from(props.children) || [];
     this.damping = props.damping || 0.9;
-
-    this.clientHeight = this.el.clientHeight;
-    this.innerHeight = window.innerHeight;
+    this.ch = this.el.clientHeight;
+    this.vh = window.innerHeight;
 
     this.state = {
       frame: null,
@@ -85,14 +77,17 @@ export class Scroller {
       rendered: 0
     };
 
-    this.elements = Array.from(props.elements);
-
     this.bindEvents();
   }
 
   bindEvents () {
     this.el.addEventListener('wheel', this.onScroll.bind(this), { passive: false });
-    Scroller.scrollRestore();
+
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    } else {
+      window.onbeforeunload = () => window.scrollTo(0, 0);
+    }
   }
 
   onStop () {
@@ -111,12 +106,15 @@ export class Scroller {
   }
 
   updateOffset (evt) {
-    const { clientHeight, innerHeight } = this;
-    const { offset } = this.state;
+    const {
+      ch,
+      vh,
+      state: { offset }
+    } = this;
     const { y } = Scroller.normalizeDelta(evt);
     const isNearEdge = Scroller.isNearEdge({
-      clientHeight,
-      innerHeight,
+      ch,
+      vh,
       offset,
       delta: y
     });
@@ -126,34 +124,38 @@ export class Scroller {
     this.state.offset += y;
   }
 
-  updateElements (position) {
-    let i = this.elements.length;
+  updateElements ({ children, position }) {
+    let i = children.length;
     while (i--) {
-      this.elements[i].style.transform = `translate3d(0, ${-position}px, 0)`;
+      children[i].style.transform = `translate3d(0, ${-position}px, 0)`;
     }
   }
 
   render (frame) {
-    const { clientHeight, innerHeight } = this;
-    const { offset, rendered } = this.state;
+    const {
+      ch,
+      vh,
+      children,
+      damping,
+      state: { offset, rendered }
+    } = this;
 
-    this.state.offset = Scroller.normalizeOffset({
-      offset,
-      clientHeight,
-      innerHeight
-    });
+    this.state.offset = Scroller.normalizeOffset({ offset, ch, vh });
 
     const position = Scroller.getPosition({
       offset,
       rendered,
-      damping: this.damping
+      damping
     });
 
     if (position === rendered) {
       return this.onStop();
     }
 
-    this.updateElements(position);
+    this.updateElements({
+      children,
+      position
+    });
 
     this.state = {
       ...this.state,
