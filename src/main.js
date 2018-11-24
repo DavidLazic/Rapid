@@ -1,10 +1,13 @@
-import Scroll from './scroll/Scroll';
+import DOM from './DOM';
+import Components from './components/index';
 
 const R = {
-  Scroll
+  DOM,
+  Components
 };
 
 export {
   R as default,
-  Scroll
+  DOM,
+  Components
 };
