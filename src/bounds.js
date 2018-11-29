@@ -32,7 +32,7 @@ class Bounds {
       x: 0,
       y: evt.wheelDelta / this.DELTA_SCALE.OTHERS,
     };
-  };
+  }
 
   static normalizeOffset ({ offset, ch, vh }) {
 

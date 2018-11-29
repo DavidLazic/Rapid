@@ -1,5 +1,5 @@
-import { Frame } from '../Frame';
-import { Bounds } from '../Bounds';
+import { Frame } from '../frame';
+import { Bounds } from '../bounds';
 
 class Panel {
 
@@ -41,10 +41,10 @@ class Panel {
       this.frame = Frame.register(this.id, this.render.bind(this));
     }
 
-    return this.updateOffset(evt);
+    return this.offsetUpdate(evt);
   }
 
-  updateOffset (evt) {
+  offsetUpdate (evt) {
     const { y } = Bounds.normalizeDelta(evt);
     const isNearEdge = Bounds.isNearEdge({
       ch: this.ch,

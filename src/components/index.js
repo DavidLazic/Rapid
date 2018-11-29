@@ -1,14 +1,14 @@
-import { Factory } from '../Factory';
-import Panel from './Panel';
-import Element from './Element';
+import { Factory } from '../factory';
+import Panel from './panel';
+import Element from './element';
 
 export default {
 
   Panel (props) {
-    return Factory.createInstance(Panel, props);
+    return Factory.create(Panel, props);
   },
 
   Element (props) {
-    return Factory.createInstance(Element, props);
+    return Factory.create(Element, props);
   }
 }

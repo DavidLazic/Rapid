@@ -5,7 +5,7 @@ class Element {
     this.scope = props.scope;
   }
 
-  animate (props = {}) {
+  translate (props = {}) {
     const speed = props.speed || 1;
     this.scope.style.transform = `translate3d(0, ${-props.offset * speed}px, 0)`;
   }
