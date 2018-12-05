@@ -3,50 +3,20 @@
  * Licensed under the MIT License.
  */
 
-import { Singleton } from './singleton';
-
 /**
  * Connect to a single rAF loop by registering listeners
- *
- * To maximize performance, rAF singleton is used for multiple listeners
- * Multiple rAF instances resulted in a lower performance due to rAF memory stacks
+ * To maximize performance, single rAF instance is preferred for multiple listeners
+ * Multiple rAF instances could result in a lower performance due to rAF memory stacks
  */
 const Frame = (window => {
 
-  let __id = null;
-
-  let __listeners = new Map();
-
   /**
    * @description
-   * Request next frame ID
-   * Invoke all active listeners and forward next frame's ID for cancellation
+   * Creates $Frame instance
    *
-   * @private
+   * @constructor
    */
-  function __render () {
-    __id = $Frame.requestAnimationFrame.call(window, __render.bind(this));
-
-    let i = __listeners.size;
-    const listeners = [ ...__listeners.values() ];
-
-    while (i--) {
-      listeners[i](__id);
-    }
-  }
-
-  /**
-   * @description
-   * Cancel next frame from running
-   *
-   * @private
-   */
-  function __cancel () {
-    $Frame.cancelAnimationFrame.call(window, __id);
-    __id = null;
-  }
-
-  class $Frame extends Singleton {
+  class $Frame {
 
     static requestAnimationFrame = window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
@@ -60,44 +30,74 @@ const Frame = (window => {
     static cancelAnimationFrame = window.cancelAnimationFrame ||
       window.mozCancelAnimationFrame;
 
-    constructor (props) {
-      super(props);
+    /**
+    * @description
+    * Requests next frame ID
+    * Invokes all active listeners and broadcasts next frame's ID for cancellation
+    *
+    * @private
+    */
+    static _broadcast = function () {
+      this.id = $Frame.requestAnimationFrame.call(window, $Frame._broadcast.bind(this));
+
+      let i = this.listeners.size;
+      const listeners = [ ...this.listeners.values() ];
+
+      while (i--) {
+        listeners[i](this.id);
+      }
     }
 
     /**
      * @description
-     * Bind a frame listener
-     * Return next frame's ID
+     * Cancels next frame from running
+     *
+     * @private
+     */
+    static _cancel = function () {
+      $Frame.cancelAnimationFrame.call(window, this.id);
+      this.id = null;
+    }
+
+    constructor () {
+      this.id = null;
+      this.listeners = new Map();
+    }
+
+    /**
+     * @description
+     * Registers a frame listener
+     * Returns next frame's ID
      *
      * @param {*} id
      * @param {Function} listener
      *
-     * @returns {Number}
+     * @return {Number}
      * @public
      */
     register (id, listener)  {
 
-      if (!__listeners.has(id)) {
-        __listeners.set(id, listener);
+      if (!this.listeners.has(id)) {
+        this.listeners.set(id, listener);
       }
 
-      return __id || $Frame.requestAnimationFrame.call(window, __render.bind(this));
+      return this.id || $Frame.requestAnimationFrame.call(window, $Frame._broadcast.bind(this));
     }
 
     /**
      * @description
-     * Remove listener by ID
-     * Do frame loop cancellation check
+     * Removes listener by ID
+     * Does frame loop cancellation check
      *
      * @param {*} id
      *
-     * @returns {void}
+     * @return {void}
      * @public
      */
     unregister (id) {
-      __listeners.delete(id);
+      this.listeners.delete(id);
 
-      return !__listeners.size && __cancel.call(this);
+      return !this.listeners.size && $Frame._cancel.call(this);
     }
   }
 

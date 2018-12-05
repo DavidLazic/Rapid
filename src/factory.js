@@ -6,12 +6,19 @@
 import { Singleton } from './singleton';
 
 /**
- * Bind a unique ID to each module for pub-sub pattern purposes
+ * Binds a unique ID to each module for pub-sub pattern purposes
  */
 const Factory = (() => {
 
-  let __id = 0;
+  let _id = 0;
 
+  /**
+   * @description
+   * Creates $Factory instance
+   *
+   * @constructor
+   * @extends Singleton
+   */
   class $Factory extends Singleton {
 
     constructor (props) {
@@ -20,17 +27,31 @@ const Factory = (() => {
 
     /**
      * @description
-     * Create new module instance
-     * Append unique module ID
+     * Get unique module ID
      *
      * @param {Function} Module
      * @param {Object} props
      *
-     * @returns {Object}
+     * @return {Object}
+     * @public
+     */
+    id () {
+      return _id++;
+    }
+
+    /**
+     * @description
+     * Creates new module instance
+     * Appends unique module ID
+     *
+     * @param {Function} Module
+     * @param {Object} props
+     *
+     * @return {Object}
      * @public
      */
     create (Module, props = {}) {
-      return new Module({ id: __id++, ...props });
+      return new Module({ id: _id++, ...props });
     }
   }
 
