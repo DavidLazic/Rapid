@@ -15,12 +15,12 @@ import { Frame } from '../../frame';
  */
 class Panel extends Element {
 
-  static DELTA_SCALE = {
+  static _DELTA_SCALE = {
     STANDARD: 1,
     OTHERS: -3
   };
 
-  static DELTA_MODE = [1.0, 28.0, 500.0];
+  static _DELTA_MODE = [1.0, 28.0, 500.0];
 
   /**
    * @description
@@ -31,8 +31,8 @@ class Panel extends Element {
    * @return {Number}
    * @private
    */
-  static getDeltaMode (mode) {
-    return this.DELTA_MODE[mode] || this.DELTA_MODE[0];
+  static _getDeltaMode (mode) {
+    return this._DELTA_MODE[mode] || this._DELTA_MODE[0];
   }
 
   /**
@@ -45,26 +45,26 @@ class Panel extends Element {
    * @return {Object}
    * @private
    */
-  static normalizeDelta (evt) {
+  static _normalizeDelta (evt) {
     if ('deltaX' in evt) {
-      const mode = this.getDeltaMode(evt.deltaMode);
+      const mode = this._getDeltaMode(evt.deltaMode);
 
       return {
-        x: evt.deltaX / this.DELTA_SCALE.STANDARD * mode,
-        y: evt.deltaY / this.DELTA_SCALE.STANDARD * mode,
+        x: evt.deltaX / this._DELTA_SCALE.STANDARD * mode,
+        y: evt.deltaY / this._DELTA_SCALE.STANDARD * mode,
       };
     }
 
     if ('wheelDeltaX' in evt) {
       return {
-        x: evt.wheelDeltaX / this.DELTA_SCALE.OTHERS,
-        y: evt.wheelDeltaY / this.DELTA_SCALE.OTHERS,
+        x: evt.wheelDeltaX / this._DELTA_SCALE.OTHERS,
+        y: evt.wheelDeltaY / this._DELTA_SCALE.OTHERS,
       };
     }
 
     return {
       x: 0,
-      y: evt.wheelDelta / this.DELTA_SCALE.OTHERS,
+      y: evt.wheelDelta / this._DELTA_SCALE.OTHERS,
     };
   }
 
@@ -74,21 +74,19 @@ class Panel extends Element {
    * within client height and view height bounds
    *
    * @param {Number} offset
-   * @param {Number} ch
-   * @param {Number} vh
+   * @param {Number} max
    *
    * @return {Number}
    * @private
    */
-  static normalizeOffset (offset, ch, vh) {
-
+  static _normalizeOffset (offset, max) {
     switch (true) {
       case (offset < 0): {
         return 0;
       }
 
-      case (offset > ch - vh): {
-        return ch - vh
+      case (offset > max): {
+        return max
       }
 
       default: {
@@ -109,24 +107,23 @@ class Panel extends Element {
    * @return {Boolean}
    * @private
    */
-  static isNearEdge (offset, delta, max) {
+  static _isNearEdge (offset, delta, max) {
     return (offset <= 0 && delta <= 0) || (offset >= max && delta >= 0);
   }
 
   constructor (props, callback) {
-    super(props);
+    super(props, Panel);
 
     this.callback = callback || function () {};
     this.damping = props.damping || 0.9;
 
     this.frameId = null;
+    this.frame = props.frame || Frame;
     this.offset = 0;
     this.rendered = 0;
-
-    this.bindEvents();
   }
 
-  bindEvents () {
+  events () {
     this.scope.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
 
     if ('scrollRestoration' in history) {
@@ -146,7 +143,7 @@ class Panel extends Element {
    */
   cancel () {
     this.frameId = null;
-    Frame.unregister(this.id);
+    this.frame.unsubscribe(this.id);
   }
 
   /**
@@ -163,13 +160,13 @@ class Panel extends Element {
     evt.preventDefault();
     evt.stopPropagation();
 
-    const { y } = Panel.normalizeDelta(evt);
-    const isNearEdge = Panel.isNearEdge(this.offset, y, this.ch - this.vh);
+    const { y } = Panel._normalizeDelta(evt);
+    const isNearEdge = Panel._isNearEdge(this.offset, y, this.ch - this.vh);
 
     if (isNearEdge) return;
 
     if (!this.frameId) {
-      this.frameId = Frame.register(this.id, this.render.bind(this));
+      this.frameId = this.frame.subscribe(this.id, this.render.bind(this));
     }
 
     this.offset += y;
@@ -183,7 +180,7 @@ class Panel extends Element {
    * @public
    */
   render () {
-    const normalized = Panel.normalizeOffset(this.offset, this.ch, this.vh);
+    const normalized = Panel._normalizeOffset(this.offset, this.ch - this.vh);
 
     const distance = normalized - this.rendered;
     const position = Number.parseFloat((normalized - (distance * this.damping)).toFixed(2));

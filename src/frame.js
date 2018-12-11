@@ -66,7 +66,7 @@ const Frame = (window => {
 
     /**
      * @description
-     * Registers a frame listener
+     * Subscribes a frame listener
      * Returns next frame's ID
      *
      * @param {*} id
@@ -75,7 +75,7 @@ const Frame = (window => {
      * @return {Number}
      * @public
      */
-    register (id, listener)  {
+    subscribe (id, listener)  {
 
       if (!this.listeners.has(id)) {
         this.listeners.set(id, listener);
@@ -94,7 +94,7 @@ const Frame = (window => {
      * @return {void}
      * @public
      */
-    unregister (id) {
+    unsubscribe (id) {
       this.listeners.delete(id);
 
       return !this.listeners.size && $Frame._cancel.call(this);

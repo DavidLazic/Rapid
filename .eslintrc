@@ -3,12 +3,14 @@ env:
   browser: true
   node: true
 
-parser: babel-eslint
+parser:
+  babel-eslint
 
 parserOptions:
   sourceType: module
 
-extends: eslint:recommended
+extends:
+  eslint:recommended
 
 rules:
   no-console: 0

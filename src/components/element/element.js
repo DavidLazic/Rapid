@@ -19,7 +19,18 @@ class Element {
 
     this.ch = this.scope.clientHeight;
     this.vh = window.innerHeight;
+
+    this.events();
   }
+
+  /**
+   * @description
+   * Binds DOM events
+   *
+   * @return {void}
+   * @public
+   */
+  events () {}
 
   /**
    * @description

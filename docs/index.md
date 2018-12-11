@@ -1,18 +1,6 @@
--- Frame
-Singleton class
 
-Usage:
-Frame.register(id, callback)
-Frame.unregister(id)
-
-API: 
-register
-unregister
-
-Static props:
-requestAnimationFrame
-cancelAnimationFrame
-
+[Frame](frame.md)  
+[Web Worker](web_worker.md)
 
 -- Factory
 
@@ -23,7 +11,7 @@ depends on the each specific case
 
 
 Create your worker file
-```
+```javascript
 // test-worker.js
 
 export default function TestWorker () {
