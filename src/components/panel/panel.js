@@ -4,7 +4,6 @@
  */
 
 import { Element } from '../element/element';
-import { Frame } from '../../frame';
 
 /**
  * @description
@@ -117,8 +116,6 @@ class Panel extends Element {
     this.callback = callback || function () {};
     this.damping = props.damping || 0.9;
 
-    this.frameId = null;
-    this.frame = props.frame || Frame;
     this.offset = 0;
     this.rendered = 0;
   }
@@ -142,7 +139,6 @@ class Panel extends Element {
    * @public
    */
   cancel () {
-    this.frameId = null;
     this.frame.unsubscribe(this.id);
   }
 
@@ -161,14 +157,11 @@ class Panel extends Element {
     evt.stopPropagation();
 
     const { y } = Panel._normalizeDelta(evt);
-    const isNearEdge = Panel._isNearEdge(this.offset, y, this.ch - this.vh);
+    const isNearEdge = Panel._isNearEdge(this.offset, y, this.height - this.viewHeight);
 
     if (isNearEdge) return;
 
-    if (!this.frameId) {
-      this.frameId = this.frame.subscribe(this.id, this.render.bind(this));
-    }
-
+    this.frame.subscribe(this.id, this.render.bind(this));
     this.offset += y;
   }
 
@@ -180,7 +173,7 @@ class Panel extends Element {
    * @public
    */
   render () {
-    const normalized = Panel._normalizeOffset(this.offset, this.ch - this.vh);
+    const normalized = Panel._normalizeOffset(this.offset, this.height - this.viewHeight);
 
     const distance = normalized - this.rendered;
     const position = Number.parseFloat((normalized - (distance * this.damping)).toFixed(2));

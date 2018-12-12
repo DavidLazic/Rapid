@@ -4,6 +4,7 @@
  */
 
 import { Factory } from '../../factory';
+import { Frame } from '../../frame';
 
 /**
  * @description
@@ -16,9 +17,10 @@ class Element {
   constructor (props = {}) {
     this.id = Factory.id();
     this.scope = props.scope;
+    this.frame = props.frame || Frame;
 
-    this.ch = this.scope.clientHeight;
-    this.vh = window.innerHeight;
+    this.height = this.scope.clientHeight;
+    this.viewHeight = window.innerHeight;
 
     this.events();
   }
