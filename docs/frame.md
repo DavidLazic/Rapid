@@ -2,6 +2,13 @@
 ### `Singleton`
 ### `Class (constructor):` $Frame
 
+## Contents
+
+- [Description](#description)
+- [Usage](#usage)
+- [Methods](#methods)
+- [Manual override](#manual-override)
+
 ## Description
 In order to maximize performance, `Frame` is instantiated as a singleton class object, and is designed to work based on a pub-sub pattern.
 
@@ -37,7 +44,7 @@ Subscribes a listener to `requestAnimationFrame` loop.
 | listener | `function` | Callback invoked on each frame render.
 
 #### Returns
-`number`  Next frame's id.
+`{number}`  Next frame's id.
 
 ---
 
@@ -50,7 +57,7 @@ Unsubscribes a listener by id from `requestAnimationFrame` loop.
 | id       | `*`        | Unique listener identifier.
 
 #### Returns
-`void`
+`{void}`
 
 ---
 
