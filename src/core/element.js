@@ -3,8 +3,8 @@
  * Licensed under the MIT License.
  */
 
-import { Factory } from '../../factory';
-import { Frame } from '../../frame';
+import { uuid } from './uuid';
+import { Frame } from './frame';
 
 /**
  * @description
@@ -14,13 +14,17 @@ import { Frame } from '../../frame';
  */
 class Element {
 
+  frame = Frame;
+
+  viewHeight = window.innerHeight;
+
   constructor (props = {}) {
-    this.id = Factory.id();
+    this.id = uuid();
     this.scope = props.scope;
-    this.frame = props.frame || Frame;
 
     this.height = this.scope.clientHeight;
-    this.viewHeight = window.innerHeight;
+
+    this.delta = this.scope.getBoundingClientRect().top;
 
     this.events();
   }
@@ -37,14 +41,20 @@ class Element {
   /**
    * @description
    * Applies transformation to an element
+   * when the element is in viewport
    *
    * @param {String} transform
    *
    * @return {void}
    * @public
    */
-  transform (transform) {
-    this.scope.style.transform = transform;
+  transform (props) {
+    const { top } = this.scope.getBoundingClientRect();
+    const shouldUpdate = (top + props.offset <= this.viewHeight) && ((this.delta + props.offset + this.height) >= 0);
+
+    if (shouldUpdate) {
+      this.scope.style.transform = props.str;
+    }
   }
 }
 

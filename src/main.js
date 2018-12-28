@@ -1,15 +1,14 @@
-import DOM from './dom';
-import { Frame } from './frame';
-import { Factory } from './factory';
-import WebWorker from './web-worker';
+import { DOM } from './core/dom';
+import { Frame } from './core/frame';
+import { uuid } from './core/uuid';
+import { WebWorker } from './core/web-worker';
+import { Element } from './core/element';
+
+import Helpers from './helpers/index';
 import Components from './components/index';
 
 const R = {
-  DOM,
-  Frame,
-  WebWorker,
-  Factory,
-  Components
+  ...DOM
 };
 
 export {
@@ -17,6 +16,8 @@ export {
   DOM,
   Frame,
   WebWorker,
-  Factory,
-  Components
+  Element,
+  uuid,
+  Components,
+  Helpers
 };

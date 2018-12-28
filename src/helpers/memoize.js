@@ -6,6 +6,7 @@
 export default function memoize (fn) {
   return function (...args) {
     fn.cache = fn.cache || {};
+
     return fn.cache[args]
       ? fn.cache[args]
       : (fn.cache[args] = fn.apply(this, args));

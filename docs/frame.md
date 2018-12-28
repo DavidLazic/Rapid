@@ -1,5 +1,5 @@
 # Frame
-### `Singleton`
+### `Instance`
 ### `Class (constructor):` $Frame
 
 ## Contents
@@ -10,7 +10,7 @@
 - [Manual override](#manual-override)
 
 ## Description
-In order to maximize performance, `Frame` is instantiated as a singleton class object, and is designed to work based on a pub-sub pattern.
+In order to maximize performance, `Frame` is instantiated once, and is designed to work as subject in observer pattern.
 
 By registering callbacks or `listeners`, a single `requestAnimationFrame` loop is created. Each frame render will trigger each of the listener functions, with next frame's id as a parameter, which can be used as a check flag inside a component.
 
@@ -63,7 +63,7 @@ Unsubscribes a listener by id from `requestAnimationFrame` loop.
 
 ## Manual override
 
-As mentioned before, too many listeners in a single rendering frame could induce performance issues. In cases like these, consider splitting listeners into multiple `Frame` instances by manually creating each and supplying each component with its own Frame.
+As mentioned before, too many listeners in a single rendering frame could induce performance issues. In a case like this, consider splitting listeners into multiple `Frame` instances by manually creating each and supplying each component with its own Frame.
 
 ```js
 import { Components } from '@davidlazic/rapid';

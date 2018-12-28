@@ -3,7 +3,8 @@
  * Licensed under the MIT License.
  */
 
-import { Singleton } from './singleton';
+
+import { Element } from './element';
 
 /**
  * @description
@@ -12,8 +13,7 @@ import { Singleton } from './singleton';
  * @constructor
  * @extends Singleton
  */
-const DOM = (document => {
-  class $DOM extends Singleton {
+const DOM = (document => ({
 
     /**
      * @description
@@ -27,7 +27,7 @@ const DOM = (document => {
      */
     id (name, scope = document) {
       return scope.getElementById(name);
-    }
+    },
 
     /**
      * @description
@@ -40,11 +40,11 @@ const DOM = (document => {
      * @public
      */
     class (name, scope = document) {
-      return Array.from(scope.getElementsByClassName(name));
+      return Array
+        .from(scope.getElementsByClassName(name))
+        .map(scope => new Element({ scope }));
     }
-  }
-
-  return new $DOM();
-})(document);
+  })
+)(document);
 
 export { DOM as default, DOM };

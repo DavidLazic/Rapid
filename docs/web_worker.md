@@ -6,13 +6,11 @@
 
 ## Description
 
-Use a web worker to offload calculations off the main thread 
-Web worker uses CPU processing, so the "heaviness" of the worker approach
-depends on the each specific case
+Use a web worker to offload calculations off the main thread. Web worker uses CPU processing, so resulting optimizations may vary from case to case.
 
 
 Create your worker file
-```javascript
+```js
 // test-worker.js
 
 export default function TestWorker () {

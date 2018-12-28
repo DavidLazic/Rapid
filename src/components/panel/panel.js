@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-import { Element } from '../element/element';
+import { Element } from '../../core/element';
 
 /**
  * @description
@@ -185,7 +185,7 @@ class Panel extends Element {
     this.offset = normalized;
     this.rendered = position;
 
-    return this.callback(position);
+    return this.callback(-position);
   }
 }
 
