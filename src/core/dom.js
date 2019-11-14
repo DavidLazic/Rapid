@@ -4,8 +4,6 @@
  */
 
 
-import { Element } from './element';
-
 /**
  * @description
  * Creates $DOM instance
@@ -41,8 +39,7 @@ const DOM = (document => ({
      */
     class (name, scope = document) {
       return Array
-        .from(scope.getElementsByClassName(name))
-        .map(scope => new Element({ scope }));
+        .from(scope.getElementsByClassName(name));
     }
   })
 )(document);

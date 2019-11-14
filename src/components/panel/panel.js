@@ -4,6 +4,7 @@
  */
 
 import { Element } from '../../core/element';
+import { Bounds } from '../../core/bounds';
 
 /**
  * @description
@@ -13,102 +14,6 @@ import { Element } from '../../core/element';
  * @extends Element
  */
 class Panel extends Element {
-
-  static _DELTA_SCALE = {
-    STANDARD: 1,
-    OTHERS: -3
-  };
-
-  static _DELTA_MODE = [1.0, 28.0, 500.0];
-
-  /**
-   * @description
-   * Returns current delta mode
-   *
-   * @param {Number} mode
-   *
-   * @return {Number}
-   * @private
-   */
-  static _getDeltaMode (mode) {
-    return this._DELTA_MODE[mode] || this._DELTA_MODE[0];
-  }
-
-  /**
-   * @description
-   * Normalizes wheel x and y delta
-   * within client height and view height bounds
-   *
-   * @param {Object} evt
-   *
-   * @return {Object}
-   * @private
-   */
-  static _normalizeDelta (evt) {
-    if ('deltaX' in evt) {
-      const mode = this._getDeltaMode(evt.deltaMode);
-
-      return {
-        x: evt.deltaX / this._DELTA_SCALE.STANDARD * mode,
-        y: evt.deltaY / this._DELTA_SCALE.STANDARD * mode,
-      };
-    }
-
-    if ('wheelDeltaX' in evt) {
-      return {
-        x: evt.wheelDeltaX / this._DELTA_SCALE.OTHERS,
-        y: evt.wheelDeltaY / this._DELTA_SCALE.OTHERS,
-      };
-    }
-
-    return {
-      x: 0,
-      y: evt.wheelDelta / this._DELTA_SCALE.OTHERS,
-    };
-  }
-
-  /**
-   * @description
-   * Normalizes offset
-   * within client height and view height bounds
-   *
-   * @param {Number} offset
-   * @param {Number} max
-   *
-   * @return {Number}
-   * @private
-   */
-  static _normalizeOffset (offset, max) {
-    switch (true) {
-      case (offset < 0): {
-        return 0;
-      }
-
-      case (offset > max): {
-        return max
-      }
-
-      default: {
-        return offset
-      }
-    }
-  }
-
-  /**
-   * @description
-   * Checks if current offset and delta direction
-   * are within client height and view height bounds
-   *
-   * @param {Number} offset
-   * @param {Number} delta
-   * @param {Number} max
-   *
-   * @return {Boolean}
-   * @private
-   */
-  static _isNearEdge (offset, delta, max) {
-    return (offset <= 0 && delta <= 0) || (offset >= max && delta >= 0);
-  }
 
   constructor (props, callback) {
     super(props, Panel);
@@ -120,7 +25,7 @@ class Panel extends Element {
     this.rendered = 0;
   }
 
-  events () {
+  init () {
     this.scope.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
 
     if ('scrollRestoration' in history) {
@@ -156,8 +61,8 @@ class Panel extends Element {
     evt.preventDefault();
     evt.stopPropagation();
 
-    const { y } = Panel._normalizeDelta(evt);
-    const isNearEdge = Panel._isNearEdge(this.offset, y, this.height - this.viewHeight);
+    const { y } = Bounds._normalizeDelta(evt);
+    const isNearEdge = Bounds._isNearEdge(this.offset, y, this.height - this.viewHeight);
 
     if (isNearEdge) return;
 
@@ -173,7 +78,7 @@ class Panel extends Element {
    * @public
    */
   render () {
-    const normalized = Panel._normalizeOffset(this.offset, this.height - this.viewHeight);
+    const normalized = Bounds._normalizeOffset(this.offset, this.height - this.viewHeight);
 
     const distance = normalized - this.rendered;
     const position = Number.parseFloat((normalized - (distance * this.damping)).toFixed(2));

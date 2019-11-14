@@ -26,17 +26,17 @@ class Element {
 
     this.delta = this.scope.getBoundingClientRect().top;
 
-    this.events();
+    this.init();
   }
 
   /**
    * @description
-   * Binds DOM events
+   * Init
    *
    * @return {void}
    * @public
    */
-  events () {}
+  init () {}
 
   /**
    * @description
@@ -48,13 +48,31 @@ class Element {
    * @return {void}
    * @public
    */
-  transform (props) {
+  transform ({ offset, transform }) {
     const { top } = this.scope.getBoundingClientRect();
-    const shouldUpdate = (top + props.offset <= this.viewHeight) && ((this.delta + props.offset + this.height) >= 0);
+    const shouldUpdate = (top + offset <= this.viewHeight) && ((this.delta + offset + this.height) >= 0);
 
     if (shouldUpdate) {
-      this.scope.style.transform = props.str;
+      this.scope.style.transform = transform;
     }
+  }
+
+  /**
+   * @description
+   * Adds class to an element
+   * when the element is in viewport
+   *
+   * @param {String} transform
+   *
+   * @return {void}
+   * @public
+   */
+  class (name) {
+    return ({ offset }) => {
+      const shouldUpdate = (this.delta + offset + 100 <= this.viewHeight);
+
+      return (shouldUpdate && !this.scope.classList.contains(name)) && this.scope.classList.add(name);
+    };
   }
 }
 
